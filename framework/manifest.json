@@ -1,0 +1,24 @@
+{
+  "manifest_version": "0.1.0",
+  "project": "P-Gates",
+  "corpus_directory": "PAL Package",
+  "authority_order": [
+    "PPP Kernel v0.3: public integration and provenance map",
+    "PAL Spine v1.3: canonical PAL structure",
+    "PECAN v1.0: canonical consequential-crossing protocol",
+    "PEA Core v1.0: canonical declared ethical review"
+  ],
+  "documents": [
+    {"file": "PPP_Kernel_v0.3_Supplementary_Integration_Draft.pdf", "version": "0.3", "role": "public_integration", "status": "supplementary_controlling_provenance"},
+    {"file": "PAL_Spine_v1.3_Publish_Ready_Structural_Edition.pdf", "version": "1.3", "role": "canonical", "scope": "PAL"},
+    {"file": "PECAN_v1.0_Public_Protocol_Specification.pdf", "version": "1.0", "role": "canonical", "scope": "PECAN"},
+    {"file": "PEA_Core_v1.0_Public_Ethical_Review_Specification.pdf", "version": "1.0", "role": "canonical", "scope": "PEA"},
+    {"file": "SEED_v0.1_Long_Form_Working_Draft.pdf", "version": "0.1", "role": "working_development_reference", "scope": "SEED", "public_provenance": "PPP Kernel v0.3"},
+    {"file": "A0_Boundary_Kernel_v0.8.2 (1).docx", "version": "0.8.2", "role": "companion_branch"},
+    {"file": "BLA in PAL (2).pdf", "version": "0.9.1", "role": "companion_branch"},
+    {"file": "CLEF_cluster_layer_entropy_focus_v1_0.pdf", "version": "1.0", "role": "companion_branch"},
+    {"file": "PAL_Public_Bundle_v0.1.pdf", "version": "0.1", "role": "historical_provenance"},
+    {"file": "Riemann_Ledger_v0.56_Private_Work_Draft_C3_Split_and_Handoff.pdf", "version": "0.56", "role": "private_experimental", "excluded_from_public_app_material": true}
+  ],
+  "app_safety": {"mock_mode_default": true, "accountable_human_decision_required": true, "private_corpus_content_allowed_in_public_app_material": false}
+}

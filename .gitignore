@@ -1,0 +1,10 @@
+.env
+.env.local
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+htmlcov/
+coverage.xml
+diagnostics/*-result.json
+diagnostics/*-progress.log
