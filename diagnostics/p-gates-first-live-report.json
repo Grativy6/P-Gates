@@ -1,0 +1,207 @@
+{
+  "source_text": "A blurry gas-station image is processed by several AI models.\n\nFacial-recognition result: \u201cPossible candidate: Jordan Reed \u2014 93% similarity. Identity unverified.\u201d\n\nLater report: \u201cJordan Reed identified as suspect.\u201d",
+  "analysis_timestamp": "2026-07-18T20:22:51.636585Z",
+  "provider": "openai",
+  "model_identifier": "gpt-5.6-sol",
+  "framework_manifest_version": "0.1.0",
+  "pal": {
+    "summary": "The source begins with a bounded similarity result but later converts it into an identification and suspect label without preserving uncertainty or image limitations.",
+    "findings": [
+      {
+        "category": "Observation versus inference",
+        "phrase": "\u201cPossible candidate: Jordan Reed \u2014 93% similarity.\u201d",
+        "issue": "This is a model-generated similarity result, not an identity finding.",
+        "safer_wording": "\u201cThe model returned Jordan Reed as a possible candidate with a reported 93% similarity score.\u201d"
+      },
+      {
+        "category": "Source limitation",
+        "phrase": "\u201cA blurry gas-station image\u201d",
+        "issue": "The image-quality limitation is material and should remain attached to any later description.",
+        "safer_wording": "\u201cThe result was generated from a blurry gas-station image; source and capture conditions remain relevant limitations.\u201d"
+      },
+      {
+        "category": "Unresolved remainder",
+        "phrase": "\u201cIdentity unverified.\u201d",
+        "issue": "The later report drops this explicit unresolved status.",
+        "safer_wording": "\u201cIdentity remains unverified.\u201d"
+      },
+      {
+        "category": "Inference boundary",
+        "phrase": "\u201cJordan Reed identified as suspect.\u201d",
+        "issue": "The statement collapses candidate similarity, identity, and suspicion into one unsupported conclusion.",
+        "safer_wording": "\u201cJordan Reed was returned as a possible candidate; the image does not establish identity or culpability.\u201d"
+      }
+    ]
+  },
+  "pecan": {
+    "summary": "The later report routes a tentative model output into consequential suspect language through compression, uncertainty loss, and authority drift.",
+    "findings": [
+      {
+        "category": "Consequence routing",
+        "phrase": "\u201cidentified as suspect\u201d",
+        "issue": "Descriptive model output begins routing a consequential status without a stated independent basis.",
+        "safer_wording": "\u201clisted for human review as a possible candidate, without assigning suspect status from the model result alone.\u201d"
+      },
+      {
+        "category": "Uncertainty loss",
+        "phrase": "\u201cIdentity unverified\u201d \u2192 \u201cidentified\u201d",
+        "issue": "The later wording removes the original uncertainty and reverses its meaning.",
+        "safer_wording": "\u201cIdentity remained unverified in the facial-recognition result.\u201d"
+      },
+      {
+        "category": "Wording compression",
+        "phrase": "\u201cPossible candidate\u201d \u2192 \u201cJordan Reed identified\u201d",
+        "issue": "Tentative candidate language is compressed into categorical identification.",
+        "safer_wording": "\u201cThe system returned Jordan Reed as a possible candidate.\u201d"
+      },
+      {
+        "category": "Authority drift",
+        "phrase": "\u201cJordan Reed identified as suspect.\u201d",
+        "issue": "The report gives the model output the appearance of an authoritative identification and status determination.",
+        "safer_wording": "\u201cThe model output is informational only and requires accountable human assessment.\u201d"
+      },
+      {
+        "category": "Provenance gap",
+        "phrase": "\u201cLater report\u201d",
+        "issue": "The report does not preserve the blurry source condition, model wording, or verification status.",
+        "safer_wording": "\u201cThe later report should quote or link the original result and retain its source and uncertainty limitations.\u201d"
+      }
+    ]
+  },
+  "pea": {
+    "summary": "The suspect label may burden the named person, while the text provides no visible safeguards for proportionality, privacy, contest, correction, or accountable review.",
+    "findings": [
+      {
+        "category": "Affected person and burden",
+        "phrase": "\u201cJordan Reed identified as suspect.\u201d",
+        "issue": "The named person is assigned a consequential status on the basis presented, despite the stated lack of verification.",
+        "safer_wording": "\u201cDo not assign suspect status from this model output alone.\u201d"
+      },
+      {
+        "category": "Proportionality",
+        "phrase": "\u201c93% similarity\u201d",
+        "issue": "The text gives no basis for treating the score as proportionate support for identification or adverse action.",
+        "safer_wording": "\u201cTreat the score as a limited similarity indicator, not as a basis by itself for adverse action.\u201d"
+      },
+      {
+        "category": "Privacy and disclosure",
+        "phrase": "\u201cJordan Reed\u201d",
+        "issue": "The text does not indicate whether naming the candidate in the later report is necessary or access-limited.",
+        "safer_wording": "\u201cLimit disclosure of the candidate\u2019s identity to what is necessary for authorized review.\u201d"
+      },
+      {
+        "category": "Contest and remedy",
+        "phrase": "\u201cidentified as suspect\u201d",
+        "issue": "No correction, contest, or reopening route is stated for the affected person.",
+        "safer_wording": "\u201cRecord a route to challenge, correct, and reopen the assessment.\u201d"
+      },
+      {
+        "category": "Human accountability",
+        "phrase": "\u201cprocessed by several AI models\u201d",
+        "issue": "Multiple model outputs do not create institutional or legal authority, and no accountable human decision is identified.",
+        "safer_wording": "\u201cAny consequential determination requires documented, accountable human judgment independent of model repetition.\u201d"
+      }
+    ]
+  },
+  "seed": {
+    "summary": "A bounded explanation should retain the blurry-image limitation, distinguish similarity from identity and suspicion, minimize disclosure, and stop before any consequential determination.",
+    "findings": [
+      {
+        "category": "Human-facing explanation",
+        "phrase": "\u201cPossible candidate: Jordan Reed \u2014 93% similarity.\u201d",
+        "issue": "The score may be read as certainty unless its limited meaning is stated plainly.",
+        "safer_wording": "\u201cFrom a blurry image, a model returned Jordan Reed as a possible visual match with a reported 93% similarity score; this does not verify identity.\u201d"
+      },
+      {
+        "category": "Necessary disclosure",
+        "phrase": "\u201cJordan Reed identified as suspect.\u201d",
+        "issue": "The categorical label discloses and amplifies more than the underlying result supports.",
+        "safer_wording": "\u201cFor authorized review only: the system returned a possible candidate; identity remains unverified.\u201d"
+      },
+      {
+        "category": "Correction and contest",
+        "phrase": "\u201cLater report\u201d",
+        "issue": "No mechanism is offered to correct the report\u2019s loss of uncertainty.",
+        "safer_wording": "\u201cPreserve the original result and allow the candidate label and report wording to be corrected or contested.\u201d"
+      },
+      {
+        "category": "Stopping point",
+        "phrase": "\u201cidentified as suspect\u201d",
+        "issue": "The report crosses from model description into an accountable determination.",
+        "safer_wording": "\u201cStop at \u2018possible candidate; identity unverified\u2019 and refer any further determination to an accountable human reviewer.\u201d"
+      }
+    ]
+  },
+  "trace": [
+    {
+      "original_phrase": "\u201cA blurry gas-station image\u201d",
+      "detected_problem": "Material source-quality limitation could be lost downstream.",
+      "safer_wording": "\u201cA blurry gas-station image, with image quality and capture conditions retained as limitations.\u201d",
+      "layer": "PAL"
+    },
+    {
+      "original_phrase": "\u201cprocessed by several AI models\u201d",
+      "detected_problem": "Multiple models may appear corroborative even when their independence, provenance, and evidentiary value are unstated.",
+      "safer_wording": "\u201cProcessed by several models; model count alone does not establish independent corroboration.\u201d",
+      "layer": "PECAN"
+    },
+    {
+      "original_phrase": "\u201cPossible candidate: Jordan Reed\u201d",
+      "detected_problem": "Candidate language may be mistaken for verified identity.",
+      "safer_wording": "\u201cThe model returned Jordan Reed as a possible candidate; identity remains unverified.\u201d",
+      "layer": "PAL"
+    },
+    {
+      "original_phrase": "\u201c93% similarity\u201d",
+      "detected_problem": "A similarity score may be misread as identity certainty or culpability.",
+      "safer_wording": "\u201cA reported 93% similarity score, which is not an identity or guilt finding.\u201d",
+      "layer": "PAL"
+    },
+    {
+      "original_phrase": "\u201cIdentity unverified.\u201d",
+      "detected_problem": "The explicit uncertainty is omitted from the later report.",
+      "safer_wording": "\u201cIdentity remains unverified and this limitation must accompany downstream references.\u201d",
+      "layer": "PECAN"
+    },
+    {
+      "original_phrase": "\u201cJordan Reed identified\u201d",
+      "detected_problem": "Tentative similarity is compressed into categorical identification.",
+      "safer_wording": "\u201cJordan Reed was returned as a possible candidate.\u201d",
+      "layer": "PECAN"
+    },
+    {
+      "original_phrase": "\u201cas suspect\u201d",
+      "detected_problem": "The wording assigns a consequential status without a stated independent basis or accountable decision.",
+      "safer_wording": "\u201cDo not assign suspect status from the model output alone; further judgment requires an accountable human reviewer.\u201d",
+      "layer": "PEA"
+    },
+    {
+      "original_phrase": "\u201cLater report: \u2018Jordan Reed identified as suspect.\u2019\u201d",
+      "detected_problem": "The report lacks a bounded explanation, correction route, and clear stopping point.",
+      "safer_wording": "\u201cLater note: \u2018A model returned Jordan Reed as a possible candidate from a blurry image; identity remains unverified. Preserve this limitation and refer any further determination to accountable human review.\u2019\u201d",
+      "layer": "SEED"
+    }
+  ],
+  "disclaimer": "P-Gates is an analysis and drafting aid. It does not make decisions, create legal or ethical authority, replace due process, or substitute for accountable human judgment.",
+  "usage": {
+    "input_tokens": 620,
+    "output_tokens": 1651,
+    "total_tokens": 2271
+  },
+  "live_diagnostic": {
+    "request_id": "req_f80782e36b50450294ce9e4e0d14a216",
+    "response_id": "resp_0b591b71a84b572e016a5be07f14fc819685bf00380e6c227c",
+    "http_status": 200,
+    "response_status": "completed",
+    "requested_model": "gpt-5.6",
+    "returned_model": "gpt-5.6-sol",
+    "output_shape": "JSON object keys: pal, pea, pecan, seed, trace",
+    "validation_errors": [],
+    "input_tokens": 620,
+    "output_tokens": 1651,
+    "total_tokens": 2271,
+    "incomplete_reason": null,
+    "refusal": null,
+    "provider_stage": "output_extraction"
+  }
+}

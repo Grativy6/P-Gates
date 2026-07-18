@@ -1,6 +1,8 @@
 from types import SimpleNamespace
 
+import httpx
 import pytest
+from openai import APIConnectionError, APIStatusError, APITimeoutError
 
 from app.config import Settings
 from app.providers import ProviderError, _shape, analyze_openai
@@ -59,3 +61,25 @@ def test_incomplete_response_is_checked_before_validation(monkeypatch: pytest.Mo
         analyze_openai("small test", Settings(), client_factory=lambda **kwargs: client)
     assert error.value.category == "incomplete_response"
     assert error.value.diagnostic.incomplete_reason == "max_output_tokens"
+
+
+@pytest.mark.parametrize(
+    ("raised", "category", "exception_class"),
+    [
+        (APITimeoutError(request=httpx.Request("POST", "https://api.openai.com/v1/responses")), "timeout", "APITimeoutError"),
+        (APIConnectionError(message="connection", request=httpx.Request("POST", "https://api.openai.com/v1/responses")), "network", "APIConnectionError"),
+        (APIStatusError("status", response=httpx.Response(502, request=httpx.Request("POST", "https://api.openai.com/v1/responses")), body=None), "api_status", "APIStatusError"),
+        (RuntimeError("unexpected"), "internal_error", "RuntimeError"),
+    ],
+)
+def test_provider_error_categories_remain_distinct(monkeypatch: pytest.MonkeyPatch, raised: Exception, category: str, exception_class: str) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "present-for-test-only")
+
+    def factory(**kwargs):
+        raise raised
+
+    with pytest.raises(ProviderError) as error:
+        analyze_openai("small test", Settings(), client_factory=factory)
+    assert error.value.category == category
+    assert error.value.exception_class == exception_class
+    assert error.value.diagnostic.provider_stage == "client_construction"

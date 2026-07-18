@@ -31,3 +31,13 @@ def test_mock_analysis_has_panels_and_trace() -> None:
 def test_blank_text_is_rejected() -> None:
     response = client.post("/api/analyze", json={"source_text": "   "})
     assert response.status_code == 422
+
+
+def test_provider_status_exposes_only_safe_booleans(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "present-for-test-only")
+    response = client.get("/api/provider-status")
+    body = response.json()
+    assert response.status_code == 200
+    assert body["openai_api_key_exists"] is True
+    assert body["openai_api_key_nonempty"] is True
+    assert body["environment_source"] == "process_environment"

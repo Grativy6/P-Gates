@@ -69,6 +69,7 @@ class LiveDiagnostic(BaseModel):
     total_tokens: int | None = None
     incomplete_reason: str | None = None
     refusal: str | None = None
+    provider_stage: str | None = None
 
 
 class AnalysisResult(BaseModel):

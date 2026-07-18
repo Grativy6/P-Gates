@@ -15,12 +15,14 @@ DISCLAIMER = "P-Gates is an analysis and drafting aid. It does not make decision
 
 
 class ProviderError(Exception):
-    def __init__(self, category: str, public_message: str, status_code: int, diagnostic: LiveDiagnostic | None = None) -> None:
+    def __init__(self, category: str, public_message: str, status_code: int, diagnostic: LiveDiagnostic | None = None, exception_class: str | None = None, safe_error_code: str | None = None) -> None:
         super().__init__(public_message)
         self.category = category
         self.public_message = public_message
         self.status_code = status_code
         self.diagnostic = diagnostic
+        self.exception_class = exception_class or type(self).__name__
+        self.safe_error_code = safe_error_code
 
 
 def _references() -> str:
@@ -64,7 +66,7 @@ def _shape(output_text: str) -> str:
     return f"JSON {type(value).__name__}"
 
 
-def _diagnostic(response: object, raw_response: object | None, requested_model: str, output_text: str | None = None) -> LiveDiagnostic:
+def _diagnostic(response: object, raw_response: object | None, requested_model: str, output_text: str | None = None, provider_stage: str | None = None) -> LiveDiagnostic:
     usage = _usage(response)
     incomplete = getattr(response, "incomplete_details", None)
     return LiveDiagnostic(
@@ -80,6 +82,16 @@ def _diagnostic(response: object, raw_response: object | None, requested_model: 
         total_tokens=usage.total_tokens if usage else None,
         incomplete_reason=getattr(incomplete, "reason", None) if incomplete else None,
         refusal=_refusal(response),
+        provider_stage=provider_stage,
+    )
+
+
+def _failure_diagnostic(error: Exception, requested_model: str, provider_stage: str) -> LiveDiagnostic:
+    return LiveDiagnostic(
+        request_id=getattr(error, "request_id", None),
+        http_status=getattr(error, "status_code", None),
+        requested_model=requested_model,
+        provider_stage=provider_stage,
     )
 
 
@@ -91,8 +103,10 @@ def analyze_openai(source_text: str, settings: Settings | None = None, client_fa
     if not has_openai_key():
         raise ProviderError("missing_api_key", "Live mode needs OPENAI_API_KEY in the server environment.", 503)
     settings = settings or Settings()
+    provider_stage = "client_construction"
     try:
         client = client_factory(timeout=settings.timeout_seconds, max_retries=0)
+        provider_stage = "request_dispatch"
         raw_response = client.responses.with_raw_response.create(
             model=settings.openai_model,
             input=[{"role": "system", "content": "Return only the requested structured route analysis."}, {"role": "user", "content": _prompt(source_text)}],
@@ -100,9 +114,11 @@ def analyze_openai(source_text: str, settings: Settings | None = None, client_fa
             max_output_tokens=settings.max_output_tokens,
             store=False,
         )
+        provider_stage = "response_parse"
         response = raw_response.parse()
+        provider_stage = "output_extraction"
         output_text = getattr(response, "output_text", "") or ""
-        diagnostic = _diagnostic(response, raw_response, settings.openai_model, output_text)
+        diagnostic = _diagnostic(response, raw_response, settings.openai_model, output_text, provider_stage)
         if getattr(response, "status", None) == "incomplete":
             raise ProviderError("incomplete_response", "The model response was incomplete; no analysis was accepted.", 502, diagnostic)
         if getattr(response, "status", None) == "failed":
@@ -110,6 +126,7 @@ def analyze_openai(source_text: str, settings: Settings | None = None, client_fa
         if diagnostic.refusal:
             raise ProviderError("model_refusal", "The model declined the request; no analysis was accepted.", 422, diagnostic)
         try:
+            provider_stage = "local_schema_validation"
             parsed = ModelAnalysis.model_validate_json(output_text)
         except ValidationError as error:
             diagnostic.validation_errors = _validation_issues(error)
@@ -118,15 +135,17 @@ def analyze_openai(source_text: str, settings: Settings | None = None, client_fa
     except ProviderError:
         raise
     except AuthenticationError as error:
-        raise ProviderError("authentication", "OpenAI authentication was rejected. Check the server environment key.", 502) from error
+        raise ProviderError("authentication", "OpenAI authentication was rejected. Check the server environment key.", 502, _failure_diagnostic(error, settings.openai_model, provider_stage), type(error).__name__, getattr(error, "code", None)) from error
     except RateLimitError as error:
-        raise ProviderError("rate_limit_or_billing", "OpenAI rate limit or billing limit reached. Try again later.", 429) from error
+        raise ProviderError("rate_limit_or_billing", "OpenAI rate limit or billing limit reached. Try again later.", 429, _failure_diagnostic(error, settings.openai_model, provider_stage), type(error).__name__, getattr(error, "code", None)) from error
     except APITimeoutError as error:
-        raise ProviderError("timeout", "The OpenAI request timed out. Try again.", 504) from error
+        raise ProviderError("timeout", "The OpenAI request timed out. Try again.", 504, _failure_diagnostic(error, settings.openai_model, provider_stage), type(error).__name__) from error
     except APIConnectionError as error:
-        raise ProviderError("network", "Could not reach the OpenAI API. Check the network and try again.", 503) from error
+        raise ProviderError("network", "Could not reach the OpenAI API. Check the network and try again.", 503, _failure_diagnostic(error, settings.openai_model, provider_stage), type(error).__name__) from error
     except APIStatusError as error:
-        raise ProviderError("api_status", "The OpenAI API returned an unexpected error. Try again later.", 502) from error
+        raise ProviderError("api_status", "The OpenAI API returned an unexpected error. Try again later.", 502, _failure_diagnostic(error, settings.openai_model, provider_stage), type(error).__name__, getattr(error, "code", None)) from error
+    except Exception as error:
+        raise ProviderError("internal_error", "The provider encountered an unexpected internal error.", 500, _failure_diagnostic(error, settings.openai_model, provider_stage), type(error).__name__) from error
 
 
 def analyze_request(request: AnalyzeRequest) -> AnalysisResult:
