@@ -2,7 +2,17 @@ const source = document.querySelector('#source');
 const provider = document.querySelector('#provider');
 const status = document.querySelector('#status');
 const results = document.querySelector('#results');
+const modeBadge = document.querySelector('#mode-badge');
+const exportStatus = document.querySelector('#export-status');
 let latestResult = null;
+
+function updateProviderBadge() {
+  const live = provider.value === 'openai';
+  modeBadge.textContent = live
+    ? '● OpenAI live mode — submitted text will be sent to the configured provider.'
+    : '● Mock mode — deterministic demo analysis; no API key or external model is used.';
+  modeBadge.classList.toggle('live', live);
+}
 
 function escapeHtml(value) {
   return value.replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -17,13 +27,14 @@ function render(result) {
   ['pal', 'pecan', 'pea', 'seed'].forEach(name => renderPanel(name, result[name]));
   document.querySelector('#trace').innerHTML = result.trace.map(t => `<div class="trace-row"><p><span>Original phrase</span>${escapeHtml(t.original_phrase)}</p><p><span>${escapeHtml(t.layer)} problem</span>${escapeHtml(t.detected_problem)}</p><p><span>Safer wording</span>${escapeHtml(t.safer_wording)}</p></div>`).join('');
   document.querySelector('#disclaimer').textContent = result.disclaimer;
+  exportStatus.textContent = '';
   results.hidden = false;
 }
 
 async function requestAnalysis() {
   const sourceText = source.value.trim();
   if (!sourceText) { status.textContent = 'Paste or load text first.'; return; }
-  status.textContent = 'Analyzing in mock mode…';
+  status.textContent = provider.value === 'mock' ? 'Analyzing in mock mode…' : 'Analyzing with OpenAI live mode…';
   const response = await fetch('/api/analyze', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({source_text:sourceText, provider:provider.value})});
   if (!response.ok) { const body = await response.json(); status.textContent = body.detail?.message || 'The analysis could not be completed.'; return; }
   latestResult = await response.json(); render(latestResult); status.textContent = `${latestResult.provider === 'mock' ? 'Mock' : 'Live'} analysis complete (${latestResult.model_identifier}).`;
@@ -39,7 +50,8 @@ function download(content, type, filename) {
   const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
 }
 
-document.querySelector('#load-example').addEventListener('click', async () => { const response = await fetch('/api/example'); source.value = (await response.json()).source_text; status.textContent = 'Built-in example loaded.'; });
+provider.addEventListener('change', updateProviderBadge);
+document.querySelector('#load-example').addEventListener('click', async () => { const response = await fetch('/api/example'); source.value = (await response.json()).source_text; status.textContent = 'Built-in fictional example loaded.'; });
 document.querySelector('#analyze').addEventListener('click', requestAnalysis);
-document.querySelector('#export-json').addEventListener('click', () => { if (latestResult) download(JSON.stringify(latestResult, null, 2), 'application/json', 'p-gates-analysis.json'); });
-document.querySelector('#export-markdown').addEventListener('click', () => { if (latestResult) download(markdown(latestResult), 'text/markdown', 'p-gates-analysis.md'); });
+document.querySelector('#export-json').addEventListener('click', () => { if (latestResult) { download(JSON.stringify(latestResult, null, 2), 'application/json', 'p-gates-analysis.json'); exportStatus.textContent = 'JSON export downloaded.'; } });
+document.querySelector('#export-markdown').addEventListener('click', () => { if (latestResult) { download(markdown(latestResult), 'text/markdown', 'p-gates-analysis.md'); exportStatus.textContent = 'Markdown export downloaded.'; } });
