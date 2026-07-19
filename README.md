@@ -17,6 +17,16 @@ uvicorn app.main:app --reload
 
 Open `http://127.0.0.1:8000`.
 
+## Testing
+
+Run the full test suite locally with:
+
+```powershell
+python -m pytest
+```
+
+GitHub Actions runs the same mocked, offline suite for pushes and pull requests to `main`. CI does not make live API requests and does not require `OPENAI_API_KEY`.
+
 ## Providers
 
 Mock mode is the default and makes no network request. OpenAI live mode uses the Responses API with a typed structured-output schema. It reads `OPENAI_API_KEY` only from the server process environment; the browser never receives it. Set the provider selector to **OpenAI live mode** to make a live request.
