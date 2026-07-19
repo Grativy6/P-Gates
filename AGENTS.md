@@ -24,9 +24,11 @@ Keep P-Gates an analysis and drafting aid, not a decision-maker. The mock MVP ha
 
 ## Coding constraints
 
-- Never modify corpus documents.
+- Treat `PAL Package/` as source corpus. Do not modify corpus documents casually; changes require explicit corpus-maintenance scope and version/provenance review.
 - Keep framework rules in separate reference/manifest files, not buried in application code.
 - Use typed Pydantic schemas and tests.
-- Mock mode is the default; no live OpenAI provider is included yet.
-- A future live provider must read `OPENAI_API_KEY` only from the runtime environment; never log, commit, display, or hard-code it.
+- Mock mode is the default. An opt-in OpenAI live provider is available for explicit live runs.
+- The live provider must read `OPENAI_API_KEY` only from the server process environment; never log, commit, display, or hard-code it.
+- Never use live OpenAI requests in CI or ordinary tests. Tests must use mock mode or injected fake clients.
+- Keep the private Riemann Ledger excluded from application prompts, fixtures, exports, repository documentation, tests, screenshots, and application UI.
 - Do not claim empirical validation, legal authority, ethical permission, or an autonomous institutional decision.
